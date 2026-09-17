@@ -24,10 +24,12 @@ below for exactly why this happens.
 python3 lastpass_to_apple.py ~/Downloads/lastpass_export.csv
 ```
 
-This writes two files next to your input file:
-- `apple_passwords_import.csv` — import this into Apple Passwords (File >
+This writes two files next to your input file, named after it (so converting
+several exports — say, your own and a family member's — in the same folder
+never overwrites one with the other):
+- `<yourfile>_apple_import.csv` — import this into Apple Passwords (File >
   Import Passwords)
-- `lastpass_secure_notes_REVIEW.csv` — LastPass secure notes, which Apple
+- `<yourfile>_secure_notes_REVIEW.csv` — LastPass secure notes, which Apple
   Passwords has no equivalent for. Review and move these manually; they are
   **not** included in the Apple import file.
 
@@ -70,6 +72,9 @@ contain your passwords in plain text.
   Key, Bank Account) are parsed with Python's `csv` module against an open
   file handle, so an embedded newline in a properly-quoted field doesn't
   corrupt the following rows.
+- **Output filenames are derived from the input filename**, not hardcoded —
+  converting a second export in the same folder (e.g. a family member's) can't
+  silently overwrite the first one's output.
 - Standard LastPass CSV export **does not include TOTP secrets** for regular
   password items (only LastPass's separate Authenticator app has its own
   export/transfer flow). If every `OTPAuth` cell comes out empty, that's a

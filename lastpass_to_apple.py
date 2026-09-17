@@ -32,8 +32,8 @@ src = Path(sys.argv[1]).expanduser()
 if not src.is_file():
     sys.exit(f"File not found: {src}")
 
-out = src.with_name("apple_passwords_import.csv")
-notes_out = src.with_name("lastpass_secure_notes_REVIEW.csv")
+out = src.with_name(f"{src.stem}_apple_import.csv")
+notes_out = src.with_name(f"{src.stem}_secure_notes_REVIEW.csv")
 logins, notes = [], []
 total_rows = blank_skipped = folder_skipped = 0
 
