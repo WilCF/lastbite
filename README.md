@@ -1,4 +1,6 @@
-# lastpass-to-apple-passwords
+# 🍎 lastbite
+
+*Take one last bite of LastPass before you go.*
 
 Convert a LastPass CSV export into a CSV that Apple's **Passwords** app (macOS
 Sequoia+) can import — with the row-level bugs that make the naive version of
