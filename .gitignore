@@ -1,0 +1,8 @@
+# Never commit real export/import data
+*.csv
+lastpass_secure_notes_REVIEW.csv
+apple_passwords_import.csv
+
+__pycache__/
+*.pyc
+.DS_Store
