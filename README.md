@@ -123,9 +123,13 @@ Example Site,https://example.com,fake_user1,FakePass123!,,
 ```
 
 Two of the three rows are garbage entries with no title, URL, username, or
-password — the exact symptom this project exists to fix. I opened
-[a narrowly-scoped PR](https://github.com/zenone/lastpass-to-apple-passwords/pull/2)
-fixing this specific bug rather than just pointing it out.
+password — the exact symptom this project exists to fix. Rather than just
+pointing bugs out, I opened small single-purpose PRs upstream for this one
+([#2](https://github.com/zenone/lastpass-to-apple-passwords/pull/2)), the
+HTML-entity bug ([#3](https://github.com/zenone/lastpass-to-apple-passwords/pull/3)),
+and the delimiter bug ([#4](https://github.com/zenone/lastpass-to-apple-passwords/pull/4)).
+If they get merged, the gaps in the table below shrink — and if you're stuck
+on zenone's tool in the meantime, those PRs contain the exact fixes.
 
 | Bug (verified by running the code) | zenone | lastbite |
 |---|---|---|
@@ -133,14 +137,15 @@ fixing this specific bug rather than just pointing it out.
 | LastPass folder markers (`url=="http://group"`) | ❌ written as a fake login | ✅ skipped |
 | Secure notes (`url=="http://sn"`) | ❌ written as a broken login with no username/password | ✅ routed to a separate review file |
 | Multi-line secure notes | ❌ embedded newlines silently stripped, lines run together (open [PR #1](https://github.com/zenone/lastpass-to-apple-passwords/pull/1) by another contributor) | ✅ preserved |
-| Semicolon-delimited exports (common Excel re-save) | ❌ silently produces an empty/garbage file, no error | ✅ auto-detected |
-| HTML-entity corruption from Chrome-extension exports (`&` → `&amp;`) | ❌ written literally into the password | ✅ unescaped |
+| Semicolon-delimited exports (common Excel re-save) | ❌ silently produces an empty/garbage file, no error (PR [#4](https://github.com/zenone/lastpass-to-apple-passwords/pull/4) open) | ✅ auto-detected |
+| UTF-8 BOM (added by Excel's "CSV UTF-8" save) | ❌ first column silently lost — every URL comes out blank | ✅ handled |
+| HTML-entity corruption from Chrome-extension exports (`&` → `&amp;`) | ❌ written literally into the password (PR [#3](https://github.com/zenone/lastpass-to-apple-passwords/pull/3) open) | ✅ unescaped |
 | Exports missing the `totp` column | ✅ (doesn't read totp at all, so nothing breaks) | ✅ tolerated |
 | TOTP → `otpauth://` conversion | ❌ always empty | ✅ when a secret is present |
 
 This isn't a criticism of zenone's project — it's a small, single-purpose
-script doing a genuinely fiddly job, and the PR above is meant as a real
-contribution back to it, not just a pitch for this repo.
+script doing a genuinely fiddly job, and the PRs above are meant as real
+contributions back to it, not just a pitch for this repo.
 
 ## License
 
