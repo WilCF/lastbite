@@ -91,15 +91,56 @@ testing the import with a small slice of the output file first.
 ## Related tools
 
 - [zenone/lastpass-to-apple-passwords](https://github.com/zenone/lastpass-to-apple-passwords) —
-  the most established existing converter for this exact task. It's simpler
-  than this one and doesn't handle secure notes, TOTP, delimiter detection,
-  or blank-row filtering, and has an open, unmerged PR for a multi-line-notes
-  corruption bug (this script avoids that class of bug by parsing against an
-  open file handle rather than pre-splitting on newlines).
+  the most established existing converter for this exact task (17+ stars).
+  Simpler than this one, and every gap below was confirmed by actually
+  running its code against synthetic test files, not just reading it — see
+  [Comparison with zenone/lastpass-to-apple-passwords](#comparison-with-zenonelastpass-to-apple-passwords).
 - [FrancisBehnen/pw-merge](https://github.com/FrancisBehnen/pw-merge) — a
   broader tool that merges Keychain, Dashlane, and LastPass exports into one
   Apple-format CSV with deduplication. Independently arrived at similar
   LastPass secure-note handling.
+
+## Comparison with zenone/lastpass-to-apple-passwords
+
+Confirmed by running [zenone's actual script](https://github.com/zenone/lastpass-to-apple-passwords/blob/main/lastpass_to_apple_passwords.py)
+against synthetic (fake) test files — not just reading the source. Given this
+input:
+
+```csv
+url,username,password,totp,extra,name,grouping,fav
+https://example.com,fake_user1,FakePass123!,,,Example Site,Personal,0
+,,,,,,,0
+http://group,,,,,,,0
+```
+
+zenone's converter outputs:
+
+```csv
+Title,URL,Username,Password,Notes,OTPAuth
+Example Site,https://example.com,fake_user1,FakePass123!,,
+,,,,,
+,http://group,,,,
+```
+
+Two of the three rows are garbage entries with no title, URL, username, or
+password — the exact symptom this project exists to fix. I opened
+[a narrowly-scoped PR](https://github.com/zenone/lastpass-to-apple-passwords/pull/2)
+fixing this specific bug rather than just pointing it out.
+
+| Bug (verified by running the code) | zenone | lastbite |
+|---|---|---|
+| Blank/junk rows written as broken logins | ❌ (PR [#2](https://github.com/zenone/lastpass-to-apple-passwords/pull/2) open) | ✅ filtered |
+| LastPass folder markers (`url=="http://group"`) | ❌ written as a fake login | ✅ skipped |
+| Secure notes (`url=="http://sn"`) | ❌ written as a broken login with no username/password | ✅ routed to a separate review file |
+| Multi-line secure notes | ❌ embedded newlines silently stripped, lines run together (open [PR #1](https://github.com/zenone/lastpass-to-apple-passwords/pull/1) by another contributor) | ✅ preserved |
+| Semicolon-delimited exports (common Excel re-save) | ❌ silently produces an empty/garbage file, no error | ✅ auto-detected |
+| HTML-entity corruption from Chrome-extension exports (`&` → `&amp;`) | ❌ written literally into the password | ✅ unescaped |
+| Exports missing the `totp` column | ✅ (doesn't read totp at all, so nothing breaks) | ✅ tolerated |
+| TOTP → `otpauth://` conversion | ❌ always empty | ✅ when a secret is present |
+
+This isn't a criticism of zenone's project — it's a small, single-purpose
+script doing a genuinely fiddly job, and the PR above is meant as a real
+contribution back to it, not just a pitch for this repo.
 
 ## License
 
